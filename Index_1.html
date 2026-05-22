@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Sec 1 G3 Math VR - Cylinder Overdrive</title>
+    <meta name="description" content="Ultra-Gamified Cylinder Mensuration Lab">
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.3.3/dist/aframe-environment-component.min.js"></script>
+    
+    <script>
+      // Gamified mode switching logic
+      AFRAME.registerComponent('geometry-toggle', {
+        schema: { mode: {type: 'string'} },
+        init: function () {
+          var el = this.el;
+          var data = this.data;
+          
+          el.addEventListener('mouseenter', function () {
+            el.setAttribute('scale', '1.1 1.1 1.1');
+          });
+          el.addEventListener('mouseleave', function () {
+            el.setAttribute('scale', '1 1 1');
+          });
+          
+          el.addEventListener('click', function () {
+            var cylinder = document.querySelector('#main-cylinder');
+            var netContainer = document.querySelector('#net-container');
+            var formulaText = document.querySelector('#formula-display');
+            var dingSound = document.querySelector('#ding-sound').components.sound;
+
+            dingSound.playSound();
+
+            if (data.mode === 'volume') {
+              // Show 3D Cylinder, hide flat net
+              cylinder.setAttribute('visible', 'true');
+              netContainer.setAttribute('visible', 'false');
+              formulaText.setAttribute('value', 'MODE: VOLUME\nFormula: Base Area x h\n= (pi * r^2) * h\n\nGlowing rings stack up to fill space!');
+              formulaText.setAttribute('color', '#00FFCC');
+            } else if (data.mode === 'surface') {
+              // Hide 3D Cylinder, show unrolled net
+              cylinder.setAttribute('visible', 'false');
+              netContainer.setAttribute('visible', 'true');
+              formulaText.setAttribute('value', 'MODE: SURFACE AREA\nFormula: 2(pi * r^2) + 2 * pi * r * h\n\nRectangle (2*pi*r * h) + 2 Circles!');
+              formulaText.setAttribute('color', '#FF007F');
+            }
+          });
+        }
+      });
+    </script>
+  </head>
+  <body>
+
+    <a-scene cursor="rayOrigin: mouse" raycaster="objects: .clickable">
+      
+      <a-assets>
+        <audio id="ding" src="https://cdn.jsdelivr.net/gh/clara-j/sample-audio/zap.mp3" preload="auto"></audio>
+      </a-assets>
+
+      <a-entity environment="preset: neon; skyType: gradient; ground: grid"></a-entity>
+      <a-entity id="ding-sound" sound="src: #ding; poolSize: 3; volume: 0.5"></a-entity>
+
+      <a-entity position="0 3 -3.5">
+        <a-plane color="#0c0f24" width="4.5" height="1.8" opacity="0.9" shader="flat" side="double">
+          <a-text id="formula-display" value="CYLINDER OVERDRIVE\nSelect a Game Mode below to unlock dimensions!" align="center" color="#FFFF00" font="monoid" width="4" position="0 0 0.05"></a-text>
+        </a-plane>
+      </a-entity>
+
+      <a-entity id="btn-volume" class="clickable" geometry-toggle="mode: volume" position="-1.2 1.2 -2.5">
+        <a-box width="0.8" height="0.4" depth="0.2" color="#00FFCC"></a-box>
+        <a-text value="VOLUME MODE" align="center" width="3" position="0 0 0.11" color="#000"></a-text>
+      </a-entity>
+
+      <a-entity id="btn-surface" class="clickable" geometry-toggle="mode: surface" position="1.2 1.2 -2.5">
+        <a-box width="0.8" height="0.4" depth="0.2" color="#FF007F"></a-box>
+        <a-text value="NET AREA MODE" align="center" width="3" position="0 0 0.11" color="#000"></a-text>
+      </a-entity>
+
+
+      <a-entity id="main-cylinder" position="0 1.5 -2" visible="true" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear">
+        <a-cylinder radius="0.5" height="1.5" color="#00FFFF" opacity="0.4" wireframe="false">
+          <a-ring color="#00FFCC" radius-inner="0.48" radius-outer="0.5" position="0 -0.5 0" rotation="90 0 0"></a-ring>
+          <a-ring color="#00FFCC" radius-inner="0.48" radius-outer="0.5" position="0 -0.1 0" rotation="90 0 0"></a-ring>
+          <a-ring color="#00FFCC" radius-inner="0.48" radius-outer="0.5" position="0 0.3 0" rotation="90 0 0"></a-ring>
+        </a-cylinder>
+      </a-entity>
+
+
+      <a-entity id="net-container" position="0 1.5 -2" visible="false">
+        <a-plane width="3.14" height="1.5" color="#FF007F" opacity="0.7" shader="flat" side="double"></a-plane>
+        <a-circle radius="0.5" color="#FF0055" position="0 1 0" rotation="0 0 0" side="double"></a-circle>
+        <a-circle radius="0.5" color="#FF0055" position="0 -1 0" rotation="0 0 0" side="double"></a-circle>
+      </a-entity>
+
+
+      <a-entity camera look-controls position="0 1.6 0">
+        <a-cursor material="color: #FFFF00; shader: flat" scale="0.6 0.6 0.6"></a-cursor>
+      </a-entity>
+
+    </a-scene>
+  </body>
+</html>
